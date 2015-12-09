@@ -13,9 +13,9 @@ var formatters = {
 
     request : function (datas) {
 
-        return datas.method + ' ' + datas.url + ' HTTP/' + datas.version.major + '.' + datas.version.minor + '\n' + Object.keys(datas.headers).map(function (name) {
-            return formatHeaderName(name) + ': ' + datas.headers[name] + '\n';
-        }).join('') + '\n' + datas.body;
+        return datas.method + ' ' + datas.url + ' HTTP/' + datas.version.major + '.' + datas.version.minor + '\r\n' + Object.keys(datas.headers).map(function (name) {
+            return formatHeaderName(name) + ': ' + datas.headers[name] + '\r\n';
+        }).join('') + '\r\n' + (datas.body ? datas.body.toString() : '');
 
     },
 
@@ -26,9 +26,9 @@ var formatters = {
 
         delete datas.headers.transferEncoding;
 
-        return 'HTTP/' + datas.version.major + '.' + datas.version.minor + ' ' + datas.status.code + ' ' + datas.status.message + '\n' + Object.keys(datas.headers).map(function (name) {
-            return formatHeaderName(name) + ': ' + datas.headers[name] + '\n';
-        }).join('') + '\n' + datas.body;
+        return 'HTTP/' + datas.version.major + '.' + datas.version.minor + ' ' + datas.status.code + ' ' + datas.status.message + '\r\n' + Object.keys(datas.headers).map(function (name) {
+            return formatHeaderName(name) + ': ' + datas.headers[name] + '\r\n';
+        }).join('') + '\r\n' + (datas.body ? datas.body.toString() : '');
 
     }
 

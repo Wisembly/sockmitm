@@ -1,9 +1,25 @@
 var HTTPParser = require('http-parser-js').HTTPParser;
 var camelCase = require('lodash/string/camelCase');
 
-exports.parseHttpStream = function (stream, type) {
+var n = 0;
+
+exports.parseHttpStream = function (stream, type, options) {
+
+    var parseBody = true;
+
+    if (options && typeof options.parseBody !== 'undefined')
+        parseBody = Boolean(options.parseBody);
 
     return new Promise(function (resolve, reject) {
+
+        var parser = new HTTPParser(HTTPParser[type.toUpperCase()]);
+        var bodyBufferSet = [], bodyBufferLength = 0;
+
+        var onError = function (error) {
+
+            close(reject, error);
+
+        };
 
         var onData = function (buffer) {
 
@@ -23,33 +39,32 @@ exports.parseHttpStream = function (stream, type) {
 
         };
 
-        var onError = function (error) {
+        var onEnd = function () {
 
-            close(reject, error);
+            try {
+                parser.finish();
+            } catch (error) {
+                close(reject, error);
+            }
 
         };
 
         var close = function (method, parameter) {
 
-            stream.removeListener('data', onData);
             stream.removeListener('error', onError);
+            stream.removeListener('data', onData);
 
             method(parameter);
 
         };
 
-        var parser = new HTTPParser(HTTPParser[type.toUpperCase()]);
-        var bodyBufferSet = [], bodyBufferLength = 0;
-
         parser[HTTPParser.kOnHeaders] = function () {
-
-            return false; // We don't want to skip parsing the body
 
         };
 
         parser[HTTPParser.kOnHeadersComplete] = function () {
 
-            return ; // Nothing special to do there
+            return parseBody ? false : true;
 
         };
 
@@ -72,7 +87,7 @@ exports.parseHttpStream = function (stream, type) {
             for (var t = 0, T = parser.info.headers.length; t < T; t += 2)
                 headers[camelCase(parser.info.headers[t])] = parser.info.headers[t + 1];
 
-            if ( type.toLowerCase( ) === 'request' ) {
+            if (type.toLowerCase() === 'request') {
 
                 var request = { method : null, url : null, version : null, headers : null, body : null };
 
@@ -80,18 +95,18 @@ exports.parseHttpStream = function (stream, type) {
                 request.url = parser.info.url;
                 request.version = { major : parser.info.versionMajor, minor : parser.info.versionMinor };
                 request.headers = headers;
-                request.body = Buffer.concat(bodyBufferSet, bodyBufferLength);
+                request.body = parseBody ? Buffer.concat(bodyBufferSet, bodyBufferLength) : null;
 
                 close(resolve, request);
 
-            } else if ( type.toLowerCase( ) === 'response' ) {
+            } else if (type.toLowerCase() === 'response') {
 
                 var response = { version : null, status : null, headers : null, body : null };
 
                 response.version = { major : parser.info.versionMajor, minor : parser.info.versionMinor };
                 response.status = { code : parser.info.statusCode, message : parser.info.statusMessage };
                 response.headers = headers;
-                response.body = Buffer.concat(bodyBufferSet, bodyBufferLength);
+                response.body = parseBody ? Buffer.concat(bodyBufferSet, bodyBufferLength) : null;
 
                 close(resolve, response);
 
@@ -99,8 +114,8 @@ exports.parseHttpStream = function (stream, type) {
 
         };
 
-        stream.addListener('data', onData);
         stream.addListener('error', onError);
+        stream.addListener('data', onData);
 
     });
 

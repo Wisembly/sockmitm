@@ -21,7 +21,7 @@ exports.startFilteredProxy = function startFilteredProxy(filter, port) {
 
                         outputStream.write(formatHttpDatas(request, 'request'));
 
-                        return parseHttpStream(outputStream, 'response').then(function (response) {
+                        return parseHttpStream(outputStream, 'response', { parseBody : request.method !== 'HEAD' }).then(function (response) {
                             return Promise.resolve(filter({ request : request, response : response })).then(function (parameters) {
                                 return parameters.response;
                             });
