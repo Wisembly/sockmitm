@@ -74,20 +74,26 @@ exports.parseHttpStream = function (stream, type) {
 
             if ( type.toLowerCase( ) === 'request' ) {
 
-                var method = HTTPParser.methods[parser.info.method];
-                var url = parser.info.url;
-                var version = { major : parser.info.versionMajor, minor : parser.info.versionMinor };
-                var body = Buffer.concat(bodyBufferSet, bodyBufferLength);
+                var request = { method : null, url : null, version : null, headers : null, body : null };
 
-                close(resolve, { method : method, url : url, version : version, headers : headers, body : body });
+                request.method = HTTPParser.methods[parser.info.method];
+                request.url = parser.info.url;
+                request.version = { major : parser.info.versionMajor, minor : parser.info.versionMinor };
+                request.headers = headers;
+                request.body = Buffer.concat(bodyBufferSet, bodyBufferLength);
+
+                close(resolve, request);
 
             } else if ( type.toLowerCase( ) === 'response' ) {
 
-                var version = { major : parser.info.versionMajor, minor : parser.info.versionMinor };
-                var status = { code : parser.info.statusCode, message : parser.info.statusMessage };
-                var body = Buffer.concat(bodyBufferSet, bodyBufferLength);
+                var response = { version : null, status : null, headers : null, body : null };
 
-                close(resolve, { version : version, status : status, headers : headers, body : body });
+                response.version = { major : parser.info.versionMajor, minor : parser.info.versionMinor };
+                response.status = { code : parser.info.statusCode, message : parser.info.statusMessage };
+                response.headers = headers;
+                response.body = Buffer.concat(bodyBufferSet, bodyBufferLength);
+
+                close(resolve, response);
 
             }
 
