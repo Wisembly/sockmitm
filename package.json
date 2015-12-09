@@ -1,7 +1,7 @@
 {
   "name": "sockmitm",
   "description": "A simple package made to intercept any HTTP request transiting via a socks5 proxy",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "./index.js",
   "dependencies": {
     "http-parser-js": "^0.4.1",
