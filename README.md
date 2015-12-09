@@ -4,6 +4,12 @@
 $> npm install sockmitm
 ```
 
+## What is this?
+
+Sockmitm is a simple package that can help you to quickly set up a socks proxy to intercept both HTTP requests and HTTP responses. Intercepted messages may be dynamically changed before forwarded them to their correct destination.
+
+A common use case for Sockmitm might be to use it with a Phantomjs process, in order to easily monitor & mock the network transactions, straight from your tests (assuming they have been wrote in Javascript too).
+
 ## Usage
 
 ```js
@@ -39,6 +45,7 @@ $> curl --socks5 localhost:6666 perdu.com
 
   - No authentication scheme
   - HTTP only - no HTTPS
+  - Various other HTTP features are silently dropped (example: Transfer-Encoding is stripped, because we always send a single chunk of data)
   - Each request (and response) will be parsed, then the result of this parsing will be used to produce the final requests/responses. During this process, some informations may be lost (such as the case of the header names).
 
 ## HTTP Object definitions

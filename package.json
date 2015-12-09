@@ -1,6 +1,6 @@
 {
   "name": "sockmitm",
-  "description": "A simple package to intercept any HTTP request",
+  "description": "A simple package made to intercept any HTTP request transiting via a socks5 proxy",
   "version": "0.0.2",
   "main": "./index.js",
   "dependencies": {
