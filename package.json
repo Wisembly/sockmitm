@@ -1,11 +1,11 @@
 {
   "name": "sockmitm",
   "description": "A simple package to intercept any HTTP request",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "./index.js",
   "dependencies": {
     "http-parser-js": "^0.4.1",
-    "lodash-node": "^3.10.1",
+    "lodash": "^3.10.1",
     "socksv5": "0.0.6"
   }
 }

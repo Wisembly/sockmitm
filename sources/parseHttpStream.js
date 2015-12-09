@@ -1,4 +1,5 @@
 var HTTPParser = require('http-parser-js').HTTPParser;
+var camelCase = require('lodash/string/camelCase');
 
 exports.parseHttpStream = function (stream, type) {
 
@@ -69,7 +70,7 @@ exports.parseHttpStream = function (stream, type) {
             var headers = Object.create(null);
 
             for (var t = 0, T = parser.info.headers.length; t < T; t += 2)
-                headers[parser.info.headers[t].toLowerCase()] = parser.info.headers[t + 1];
+                headers[camelCase(parser.info.headers[t])] = parser.info.headers[t + 1];
 
             if ( type.toLowerCase( ) === 'request' ) {
 
