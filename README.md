@@ -48,6 +48,10 @@ $> curl --socks5 localhost:6666 perdu.com
   - Various other HTTP features are silently dropped (example: Transfer-Encoding is stripped, because we always send a single chunk of data)
   - Each request (and response) will be parsed, then the result of this parsing will be used to produce the final requests/responses. During this process, some informations may be lost (such as the case of the header names).
 
+## HTTP Compression
+
+Don't forget to remove the `Accept-Encoding` headers if you wish to intercept the body of the response. Otherwise, the server might send you gzipped data, that you would then have to unzip using the native [zlib api](https://nodejs.org/api/zlib.html).
+
 ## HTTP Object definitions
 
 ### Request
