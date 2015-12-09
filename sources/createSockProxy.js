@@ -22,6 +22,14 @@ exports.createSockProxy = function (callback, port) {
         var inputStream;
         var outputStream;
 
+        function cleanup() {
+
+            return Promise.all([ inputStream, outputStream ]).then(function (streams) {
+                streams.forEach(function (stream) { if (stream) stream.destroy(); });
+            });
+
+        }
+
         Promise.resolve(callback(info, function () {
 
             if (!inputStream)
@@ -36,11 +44,21 @@ exports.createSockProxy = function (callback, port) {
 
             return outputStream;
 
-        })).catch(function (error) {
+        })).then(function (result) {
 
-            Promise.all([ inputStream, outputStream ]).then(function (streams) {
-                streams.forEach(function (stream) { if (stream) stream.destroy(); });
-            });
+            cleanup();
+
+            return result;
+
+        }, function (error) {
+
+            cleanup();
+
+            throw error;
+
+        }).catch(function (error) {
+
+            console.error(error.stack);
 
         });
 
