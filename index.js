@@ -4,7 +4,7 @@ var parseHttpStream = require('./sources/parseHttpStream').parseHttpStream;
 var createSockProxy = require('./sources/createSockProxy').createSockProxy;
 var formatHttpDatas = require('./sources/formatHttpDatas').formatHttpDatas;
 
-exports.startFilteredProxy = function startFilteredProxy(filter, port) {
+exports.startFilteredProxy = function startFilteredProxy(filter) {
 
     return createSockProxy(function (target, getInStream, getOutStream) {
 
@@ -39,6 +39,6 @@ exports.startFilteredProxy = function startFilteredProxy(filter, port) {
 
         });
 
-    }, port);
+    });
 
 };

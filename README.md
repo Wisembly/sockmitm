@@ -34,7 +34,7 @@ SockMitm.startFilteredProxy( function ( parameters ) {
     return { request : request, response : response };
     return Promise.resolve( { request : request, response : response } );
 
-}, 6666 );
+} ).listen( 6666 );
 ```
 
 ```

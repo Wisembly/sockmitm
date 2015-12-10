@@ -15,7 +15,7 @@ function openSocketTo(target, port) {
 
 }
 
-exports.createSockProxy = function (callback, port) {
+exports.createSockProxy = function (callback) {
 
     return SocksV5.createServer(function (info, accept, deny) {
 
@@ -62,6 +62,6 @@ exports.createSockProxy = function (callback, port) {
 
         });
 
-    }).useAuth(SocksV5.auth.None()).listen(port);
+    }).useAuth(SocksV5.auth.None());
 
 };
