@@ -97,6 +97,9 @@ exports.parseHttpStream = function (stream, type, options) {
                 request.headers = headers;
                 request.body = parseBody ? Buffer.concat(bodyBufferSet, bodyBufferLength) : null;
 
+                if (request.body)
+                    request.headers.contentLength = null;
+
                 close(resolve, request);
 
             } else if (type.toLowerCase() === 'response') {
@@ -107,6 +110,9 @@ exports.parseHttpStream = function (stream, type, options) {
                 response.status = { code : parser.info.statusCode, message : parser.info.statusMessage };
                 response.headers = headers;
                 response.body = parseBody ? Buffer.concat(bodyBufferSet, bodyBufferLength) : null;
+
+                if (response.body)
+                    response.headers.contentLength = null;
 
                 close(resolve, response);
 

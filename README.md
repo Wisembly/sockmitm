@@ -48,6 +48,12 @@ $> curl --socks5 localhost:6666 perdu.com
   - Various other HTTP features are silently dropped (example: Transfer-Encoding is stripped, because we always send a single chunk of data)
   - Each request (and response) will be parsed, then the result of this parsing will be used to produce the final requests/responses. During this process, some informations may be lost (such as the case of the header names).
 
+## Automatic content-length
+
+Should you want to alter the content of a request (or response), be aware that the Content-Length header will need to be changed accordingly. Fortunately, Sockmitm can handle this automatically, and you probably won't have to deal with it at all. However, because of the way it is implemented, it means that you can't rely on the Content-Length header (it will be null): uses `body.length` instead.
+
+Note that you can also force a specific Content-Length if you need to - just set it to a value other than `null`.
+
 ## HTTP Compression
 
 Don't forget to remove the `Accept-Encoding` headers if you wish to intercept the body of the response. Otherwise, the server might send you gzipped data, that you would then have to unzip using the native [zlib api](https://nodejs.org/api/zlib.html).

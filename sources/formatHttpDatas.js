@@ -13,6 +13,12 @@ var formatters = {
 
     request : function (datas) {
 
+        datas = clone(datas);
+        datas.headers = clone(datas.headers);
+
+        if (datas.body !== null && datas.headers.contentLength === null)
+            datas.headers.contentLength = datas.body.length;
+
         return datas.method + ' ' + datas.url + ' HTTP/' + datas.version.major + '.' + datas.version.minor + '\r\n' + Object.keys(datas.headers).map(function (name) {
             return formatHeaderName(name) + ': ' + datas.headers[name] + '\r\n';
         }).join('') + '\r\n' + (datas.body ? datas.body.toString() : '');
@@ -25,6 +31,9 @@ var formatters = {
         datas.headers = clone(datas.headers);
 
         delete datas.headers.transferEncoding;
+
+        if (datas.body !== null && datas.headers.contentLength === null)
+            datas.headers.contentLength = datas.body.length;
 
         return 'HTTP/' + datas.version.major + '.' + datas.version.minor + ' ' + datas.status.code + ' ' + datas.status.message + '\r\n' + Object.keys(datas.headers).map(function (name) {
             return formatHeaderName(name) + ': ' + datas.headers[name] + '\r\n';
