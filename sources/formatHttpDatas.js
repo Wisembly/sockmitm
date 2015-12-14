@@ -16,6 +16,11 @@ var formatters = {
         datas = clone(datas);
         datas.headers = clone(datas.headers);
 
+        if (datas.body instanceof Object && !(datas.body instanceof Buffer)) {
+            datas.headers.contentType = 'application/json';
+            datas.body = Object.stringify(datas.body);
+        }
+
         if (datas.body !== null && datas.headers.contentLength === null)
             datas.headers.contentLength = datas.body.length;
 
@@ -30,10 +35,15 @@ var formatters = {
         datas = clone(datas);
         datas.headers = clone(datas.headers);
 
-        delete datas.headers.transferEncoding;
+        if (datas.body instanceof Object && !(datas.body instanceof Buffer)) {
+            datas.headers.contentType = 'application/json';
+            datas.body = Object.stringify(datas.body);
+        }
 
         if (datas.body !== null && datas.headers.contentLength === null)
             datas.headers.contentLength = datas.body.length;
+
+        delete datas.headers.transferEncoding;
 
         return 'HTTP/' + datas.version.major + '.' + datas.version.minor + ' ' + datas.status.code + ' ' + datas.status.message + '\r\n' + Object.keys(datas.headers).map(function (name) {
             return formatHeaderName(name) + ': ' + datas.headers[name] + '\r\n';

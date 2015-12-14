@@ -48,6 +48,10 @@ $> curl --socks5 localhost:6666 perdu.com
   - Various other HTTP features are silently dropped (example: Transfer-Encoding is stripped, because we always send a single chunk of data)
   - Each request (and response) will be parsed, then the result of this parsing will be used to produce the final requests/responses. During this process, some informations may be lost (such as the case of the header names).
 
+## Body types
+
+The `body` field of the intercepted requests/responses will always be a `Buffer` instance. However, you can set it to either a new buffer, a string, a JSON structure, or null. Be aware that if you set the body to be a JSON structure, the content type will be automatically be set to `application/json`. To avoid this, you can do the stringification yourself.
+
 ## Automatic content-length
 
 Should you want to alter the content of a request (or response), be aware that the Content-Length header will need to be changed accordingly. Fortunately, Sockmitm can handle this automatically, and you probably won't have to deal with it at all. However, because of the way it is implemented, it means that you can't rely on the Content-Length header (it will be null): uses `body.length` instead.
