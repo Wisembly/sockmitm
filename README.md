@@ -20,6 +20,11 @@ SockMitm.startFilteredProxy( function ( parameters ) {
     var request = parameters.request;
     var response = parameters.response;
 
+    if ( ! response )
+        // We tell the server to send us the data uncompressed
+        // Some encodings such as SDCH are known to break Sockmitm
+        delete request.headers.acceptEncoding;
+
     if ( ! response ) {
         // You can change the request before we send it to the remote server
         // You can also return an HTTP response object - in such a case, the request isn't forwarded at all, and your response becomes the "server response"
@@ -61,6 +66,8 @@ Note that you can also force a specific Content-Length if you need to - just set
 ## HTTP Compression
 
 Don't forget to remove the `Accept-Encoding` headers if you wish to intercept the body of the response. Otherwise, the server might send you gzipped data, that you would then have to unzip using the native [zlib api](https://nodejs.org/api/zlib.html).
+
+**An important note:** it seems, but it's not quite clear *why*, that Sockmitm breaks Chrome because of the SDCH encoding ([related Privoxy issue](https://code.google.com/p/chromium/issues/detail?id=37777#c5)). Should you hit the 330 error (`ERR_CONTENT_DECODING_FAILED`), it is very possible that you will have to change the `Accept-Encoding` header to remove the unsupported encodings (stripping the header altogether works too). Thankfully, you can do this right from the proxy, so you won't have to alter your application :)
 
 ## HTTP Object definitions
 
