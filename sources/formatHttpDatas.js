@@ -18,7 +18,7 @@ var formatters = {
 
         if (datas.body instanceof Object && !(datas.body instanceof Buffer)) {
             datas.headers.contentType = 'application/json';
-            datas.body = Object.stringify(datas.body);
+            datas.body = JSON.stringify(datas.body);
         }
 
         if (datas.body !== null && datas.headers.contentLength === null)
@@ -37,7 +37,7 @@ var formatters = {
 
         if (datas.body instanceof Object && !(datas.body instanceof Buffer)) {
             datas.headers.contentType = 'application/json';
-            datas.body = Object.stringify(datas.body);
+            datas.body = JSON.stringify(datas.body);
         }
 
         if (datas.body !== null && datas.headers.contentLength === null)
