@@ -12,6 +12,8 @@ exports.parseHttpStream = function (stream, type, options) {
 
     return new Promise(function (resolve, reject) {
 
+        var parseData = new Buffer([]);
+
         var parser = new HTTPParser(HTTPParser[type.toUpperCase()]);
         var bodyBufferSet = [], bodyBufferLength = 0;
 
@@ -25,11 +27,9 @@ exports.parseHttpStream = function (stream, type, options) {
 
             try {
 
-                var consumed = parser.execute(buffer);
-
-                if (consumed !== buffer.length) {
-                    throw new Error('A request buffer hasn\'t been fully consumed');
-                }
+                parseData = Buffer.concat([parseData, buffer]);
+                var consumed = parser.execute(parseData);
+                parseData = parseData.slice(consumed);
 
             } catch (error) {
 
