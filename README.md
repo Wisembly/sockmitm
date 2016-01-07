@@ -1,4 +1,4 @@
-# sockmitm
+# SockMITM :satellite:
 
 ```
 $> npm install sockmitm
@@ -6,9 +6,9 @@ $> npm install sockmitm
 
 ## What is this?
 
-Sockmitm is a simple package that can help you to quickly set up a socks proxy to intercept both HTTP requests and HTTP responses. Intercepted messages may be dynamically changed before forwarded them to their correct destination.
+SockMITM is an utility package that gives you a way to quickly setup socks proxies, that you can then use to intercept both HTTP requests and HTTP responses coming from and to your applications. Intercepted messages can be dynamically changed before being forwarded to their destination, and HTTP responses can be manually crafted and returned, without even opening a connection to the remote server.
 
-A common use case for Sockmitm might be to use it with a Phantomjs process, in order to easily monitor & mock the network transactions, straight from your tests (assuming they have been wrote in Javascript too).
+A common use case for SockMITM is to use it your testsuites, in order to easily monitor and mock your application's requests straight from your Node.js tests.
 
 ## Usage
 
@@ -21,21 +21,20 @@ SockMitm.startFilteredProxy( function ( parameters ) {
     var response = parameters.response;
 
     if ( ! response )
-        // We tell the server to send us the data uncompressed
-        // Some encodings such as SDCH are known to break Sockmitm
+        // We tell the server to only send us uncompressed data
         delete request.headers.acceptEncoding;
 
     if ( ! response ) {
-        // You can change the request before we send it to the remote server
-        // You can also return an HTTP response object - in such a case, the request isn't forwarded at all, and your response becomes the "server response"
+        // You can change the request before it is sent to the remote server
+        // You can also return an HTTP response object - in such a case, the request won't forwarded at all, and your response will be returned to the client
         console.log( '[REQ] ' + request.headers.host + request.url );
     } else {
-        // Too late to change the request, since the server already answered us!
-        // However, you can still alter the response sent by the server
+        // It is now too late to alter the request, since the server already answered us!
+        // However, you can still alter the response that has been sent by the server before returning it to the client
         console.log( '[RES] ' + request.headers.host + request.url + ' (' + response.status.code + ' ' + response.status.message + ')' );
     }
 
-    // You can return either a promise or a plain object, as you want
+    // Note that you can return either a promise or a plain object, as you want
     return { request : request, response : response };
     return Promise.resolve( { request : request, response : response } );
 
@@ -49,9 +48,9 @@ $> curl --socks5 localhost:6666 perdu.com
 ## Caveheats
 
   - No authentication scheme
-  - HTTP only - no HTTPS
+  - HTTP only - no HTTPS, since the intercepted data would still be encrypted
   - Various other HTTP features are silently dropped (example: Transfer-Encoding is stripped, because we always send a single chunk of data)
-  - Each request (and response) will be parsed, then the result of this parsing will be used to produce the final requests/responses. During this process, some informations may be lost (such as the case of the header names).
+  - Each request (and response) will be parsed and stored as JS objects. Before being actually sent, these objects will be reformatted to produce the final network data. During this process, some informations may be lost (such as the headers names cases).
 
 ## Body types
 
@@ -59,32 +58,23 @@ The `body` field of the intercepted requests/responses will always be a `Buffer`
 
 ## Automatic content-length
 
-Should you want to alter the content of a request (or response), be aware that the Content-Length header will need to be changed accordingly. Fortunately, Sockmitm can handle this automatically, and you probably won't have to deal with it at all. However, because of the way it is implemented, it means that you can't rely on the Content-Length header (it will be null): uses `body.length` instead.
+Should you want to alter the content of a request (or response), be aware that the Content-Length header will need to be changed accordingly. Fortunately, SockMITM can handle this automatically, and you probably won't have to deal with it at all. However, because of the way it is implemented, it means that you can't rely on the Content-Length header (it will be null): uses `body.length` instead.
 
 Note that you can also force a specific Content-Length if you need to - just set it to a value other than `null`.
 
-## HTTP Compression
+## HTTP compression
 
-Don't forget to remove the `Accept-Encoding` headers if you wish to intercept the body of the response. Otherwise, the server might send you gzipped data, that you would then have to unzip using the native [zlib api](https://nodejs.org/api/zlib.html).
+You may want to ensure that the `Accept-Encoding` header is stripped if you wish to intercept the body of the response. Otherwise, the server might send you gzipped data, that you would then have to unzip using the native [zlib api](https://nodejs.org/api/zlib.html). [Stripping the header altogether](https://github.com/Wisembly/sockmitm/blob/master/example.js#L10) is the best way to ensure that the remote server will only send you back uncompressed data.
 
-**An important note:** it seems, but it's not quite clear *why*, that Sockmitm breaks Chrome because of the SDCH encoding ([related Privoxy issue](https://code.google.com/p/chromium/issues/detail?id=37777#c5)). Should you hit the 330 error (`ERR_CONTENT_DECODING_FAILED`), it is very possible that you will have to change the `Accept-Encoding` header to remove the unsupported encodings (stripping the header altogether works too). Thankfully, you can do this right from the proxy, so you won't have to alter your application :)
+## HTTP object definitions
 
-## HTTP Object definitions
+### Requests members
 
-### Request
+method / url / version / headers / body
 
-  - method
-  - url
-  - version
-  - headers
-  - body
+### Responses members
 
-### Response
-
-  - version
-  - status
-  - headers
-  - body
+version / status / headers / body
 
 ## License (MIT)
 

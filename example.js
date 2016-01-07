@@ -1,4 +1,4 @@
-var SockMitm = require( './' );
+var SockMitm = require( 'sockmitm' );
 
 SockMitm.startFilteredProxy( function ( parameters ) {
 
@@ -6,21 +6,20 @@ SockMitm.startFilteredProxy( function ( parameters ) {
     var response = parameters.response;
 
     if ( ! response )
-        // We tell the server to send us the data uncompressed
-        // Some encodings such as SDCH are known to break Sockmitm
+        // We tell the server to only send us uncompressed data
         delete request.headers.acceptEncoding;
 
     if ( ! response ) {
-        // You can change the request before we send it to the remote server
-        // You can also return an HTTP response object - in such a case, the request isn't forwarded at all, and your response becomes the "server response"
-        console.log( '[REQ] ' + request.headers.host + request.url + ' ' + JSON.stringify( request.headers ) );
+        // You can change the request before it is sent to the remote server
+        // You can also return an HTTP response object - in such a case, the request won't forwarded at all, and your response will be returned to the client
+        console.log( '[REQ] ' + request.headers.host + request.url );
     } else {
-        // Too late to change the request, since the server already answered us!
-        // However, you can still alter the response sent by the server
+        // It is now too late to alter the request, since the server already answered us!
+        // However, you can still alter the response that has been sent by the server before returning it to the client
         console.log( '[RES] ' + request.headers.host + request.url + ' (' + response.status.code + ' ' + response.status.message + ')' );
     }
 
-    // You can return either a promise or a plain object, as you want
+    // Note that you can return either a promise or a plain object, as you want
     return { request : request, response : response };
     return Promise.resolve( { request : request, response : response } );
 
