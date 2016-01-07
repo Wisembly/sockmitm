@@ -19,6 +19,9 @@ function waitForCompletion(socket) {
 
     return Promise.resolve(socket).then(function (socket) {
 
+        if ( socket.bufferSize === 0 )
+            return socket;
+
         return new Promise(function (resolve) {
 
             socket.once('drain', function () {
