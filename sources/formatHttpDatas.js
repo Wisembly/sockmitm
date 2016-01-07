@@ -24,9 +24,14 @@ var formatters = {
         if (datas.body !== null && datas.headers.contentLength === null)
             datas.headers.contentLength = datas.body.length;
 
-        return datas.method + ' ' + datas.url + ' HTTP/' + datas.version.major + '.' + datas.version.minor + '\r\n' + Object.keys(datas.headers).map(function (name) {
+        var header = datas.method + ' ' + datas.url + ' HTTP/' + datas.version.major + '.' + datas.version.minor + '\r\n' + Object.keys(datas.headers).map(function (name) {
             return formatHeaderName(name) + ': ' + datas.headers[name] + '\r\n';
-        }).join('') + '\r\n' + (datas.body ? datas.body.toString() : '');
+        }).join('') + '\r\n';
+
+        return Buffer.concat( [
+            new Buffer( header ),
+            new Buffer( datas.body )
+        ] );
 
     },
 
@@ -45,9 +50,14 @@ var formatters = {
 
         delete datas.headers.transferEncoding;
 
-        return 'HTTP/' + datas.version.major + '.' + datas.version.minor + ' ' + datas.status.code + ' ' + datas.status.message + '\r\n' + Object.keys(datas.headers).map(function (name) {
+        var header = 'HTTP/' + datas.version.major + '.' + datas.version.minor + ' ' + datas.status.code + ' ' + datas.status.message + '\r\n' + Object.keys(datas.headers).map(function (name) {
             return formatHeaderName(name) + ': ' + datas.headers[name] + '\r\n';
-        }).join('') + '\r\n' + (datas.body ? datas.body.toString() : '');
+        }).join('') + '\r\n';
+
+        return Buffer.concat( [
+            new Buffer( header ),
+            new Buffer( datas.body )
+        ] );
 
     }
 
