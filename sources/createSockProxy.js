@@ -7,8 +7,24 @@ function openSocketTo(target, port) {
 
         var socket = Net.connect(port, target);
 
-        socket.on('connect', function () {
+        socket.once('connect', function () {
             resolve(socket);
+        });
+
+    });
+
+}
+
+function waitForCompletion(socket) {
+
+    return Promise.resolve(socket).then(function (socket) {
+
+        return new Promise(function (resolve) {
+
+            socket.once('drain', function () {
+                resolve(socket);
+            });
+
         });
 
     });
@@ -24,7 +40,13 @@ exports.createSockProxy = function (callback) {
 
         function cleanup() {
 
-            return Promise.all([ inputStream, outputStream ]).then(function (streams) {
+            var onReadyForClean = inputStream
+                ? waitForCompletion(inputStream)
+                : Promise.resolve();
+
+            return onReadyForClean.then(function () {
+                return Promise.all([ inputStream, outputStream ]);
+            }).then(function (streams) {
                 streams.forEach(function (stream) { if (stream) stream.destroy(); });
             });
 
