@@ -24,6 +24,9 @@ var formatters = {
         if (datas.body !== null && datas.headers.contentLength === null)
             datas.headers.contentLength = datas.body.length;
 
+        if (datas.body == null)
+            datas.body = [];
+
         var header = datas.method + ' ' + datas.url + ' HTTP/' + datas.version.major + '.' + datas.version.minor + '\r\n' + Object.keys(datas.headers).map(function (name) {
             return formatHeaderName(name) + ': ' + datas.headers[name] + '\r\n';
         }).join('') + '\r\n';
@@ -47,6 +50,9 @@ var formatters = {
 
         if (datas.body !== null && datas.headers.contentLength === null)
             datas.headers.contentLength = datas.body.length;
+
+        if (datas.body == null)
+            datas.body = [];
 
         delete datas.headers.transferEncoding;
 
